@@ -15,7 +15,7 @@ enemiesInit(vector<MeleeEnemy> &meleeEnemies, vector<RangeEnemy> &rangeEnemies, 
         {807, 1025},
         {3000, 1160},
         {4160, 770},
-        {6300, 370},
+        {6300, 400},
         {6300, 1312}};
 
     Vector2f MeleeEnemySecondLevelCoords[6]{
