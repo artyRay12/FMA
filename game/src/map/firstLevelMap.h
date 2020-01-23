@@ -1,0 +1,63 @@
+#include <SFML/Graphics.hpp>
+#include <cmath>
+#include <iostream>
+#include <algorithm>
+
+const int H = 50;  //50
+const int W = 350; //240
+
+String firstLevelMap[H] = {
+
+    " 00                                                                                                                                                                                                                                             ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "   BBBBB                                      BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB      BBBBB                                                                                                                                                 ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                            1              H            1                                       ",
+    "                                                                                                                                                                            BBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                       ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                                                                ",
+    "               1               H     1                                                                                                                                BBBB                                                                      ",
+    "               BBBBBBBBBBBBBBBBBBBBBBB                                                                                                                                                                                                          ",
+    "                                                                                                                                                                BBB                                                                            ",
+    "                                                                                                                                                                                                                                               ",
+    "           BBB                                                                                                                                                                                                                                 ",
+    "                                                                                                                                                         BBB                                                                                   ",
+    "                                                                                                                          1          H               1                                                                  1               2  1    ",
+    "        BBB                                                                                                               BBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                  BBBBBBBBBBBBBBBBBBBB    ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                    BBB                                                                               BB                                        ",
+    "                                                                                                                                                                                                                BBB                             ",
+    "  BBB                                                                                                                                                                                   1       1                                               ",
+    "                                                                                                                                                                                        BBBBBBBBB                                              ",
+    "                                                                                                              BBB                                                                                                                               ",
+    "  1                                                      1                                                                                                                                                                                       ",
+    "  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                                                             BBB                                      ",
+    "                                                        B                                             BBBBB                                                                                                                                     ",
+    "                                                        B                                                                                                                                                                                       ",
+    "                                                        B                             1           1                                                                                                           B   1                     1      ",
+    "                                                        BBBBBBBBBBBBB   BBBBBB        BBBBBBBBBBBBB                                                                                                                BBBBBBBBBBBBBBBBBBBBBBB      ",
+    "                                                                     PPP      PPPPPPPP                                                                                                                                                          ",
+    "                                                                                                                                                                                                                                                ",
+    "                                                                                                                                                                                                         BBB                                    ",
+    "                                                                                                                                                                                     1              1                                           ",
+    "                                                                                                                                            1          1    B       B      B         BBBBBBBBBBBBBBBB                                           ",
+    "                                                                                                                                            BBBBBBBBBBBB                                                                                        ",
+    "                                                                                                                                                        PPPPPPPPPPPPPPPPPPPPPPPPPPPP                  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP          ",
+    "                                                                                                            1                 H          1                                                                                                      ",
+    "                                                                                                            BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                     ",
+};
+
+String *firstLevelPtr = firstLevelMap;
