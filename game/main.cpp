@@ -97,6 +97,7 @@ void gameEndChecker(Boss boss, gameState &gameState)
     if (!boss.alive)
     {
         gameState = gameState::endGame;
+        boss.state = bossState::none;
     }
 }
 
@@ -132,10 +133,6 @@ void menuUpdate(gameState &gameState, Clock &deltaTime)
         if (Keyboard::isKeyPressed(Keyboard::Escape))
             gameState = gameState::menu;
         break;
-        if (Keyboard::isKeyPressed(Keyboard::R))
-        {
-            gameState = gameState::reloadGame;
-        }
     case gameOver:
         if (Keyboard::isKeyPressed(Keyboard::Escape))
             gameState = gameState::menu;
@@ -321,7 +318,7 @@ int main()
             break;
         case reloadGame:
             titresY = 900;
-            currentLevel = 1;
+            currentLevel = 3;
             edward.lives = 3;
             mapInit(mapTextures, map, currentLevel);
             enemiesInit(meleeEnemies, rangeEnemies, currentLevel);

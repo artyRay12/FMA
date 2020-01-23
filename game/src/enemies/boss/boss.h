@@ -37,7 +37,6 @@ class Boss
     };
 
     Vector2f pos = BOSS_START_POS;
-
     Sprite sprite;
     Sprite healthBar;
 
@@ -108,6 +107,7 @@ class Boss
 
 void bossInit(Boss &boss)
 {
+    Vector2f pos = BOSS_START_POS;
     boss.sprite.setPosition(boss.pos);
     boss.isBossActive = false;
     boss.alive = true;
@@ -458,17 +458,17 @@ void updateByHealth(Boss &boss)
         boss.view.reset(sf::FloatRect(0, 0, 1440, 900));
     }
 
-    if (boss.health == 390)
+    if (boss.health == 330)
     {
         boss.state = bossState::phaseChanger;
     }
 
-    if (boss.health == 299)
+    if (boss.health == 209)
     {
         boss.state = bossState::phaseChanger;
     }
 
-    if (boss.health == 178)
+    if (boss.health == 118)
     {
         boss.phase = 3;
     }
