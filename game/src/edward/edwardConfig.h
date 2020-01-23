@@ -7,7 +7,7 @@ using namespace std;
 
 const int EDWARD_INITIAL_HEALTH = 120;
 
-const Vector2f EDWARD_START_POS{12800, 100};
+const Vector2f EDWARD_START_POS{100, 100};
 const Vector2f EDWARD_LIVES_COUNTER_POS{75, 75};
 const Vector2f EDWARD_HEALTH_BAR_POS{85, 80};
 

@@ -111,10 +111,12 @@ void menuUpdate(gameState &gameState, Clock &deltaTime)
         if (Keyboard::isKeyPressed(Keyboard::Space))
             gameState = gameState::instructions;
         break;
+
     case instructions:
         if ((Keyboard::isKeyPressed(Keyboard::BackSpace)) || (Keyboard::isKeyPressed(Keyboard::Escape)))
             gameState = gameState::menu;
         break;
+
     case gameRun:
         if (Keyboard::isKeyPressed(Keyboard::Escape) && deltaTime.getElapsedTime().asSeconds() > 0.2)
         {
@@ -122,6 +124,7 @@ void menuUpdate(gameState &gameState, Clock &deltaTime)
             deltaTime.restart();
         }
         break;
+
     case pause:
         if (Keyboard::isKeyPressed(Keyboard::Escape) && deltaTime.getElapsedTime().asSeconds() > 0.2)
         {
@@ -129,10 +132,12 @@ void menuUpdate(gameState &gameState, Clock &deltaTime)
             deltaTime.restart();
         }
         break;
+
     case endGame:
         if (Keyboard::isKeyPressed(Keyboard::Escape))
             gameState = gameState::menu;
         break;
+        
     case gameOver:
         if (Keyboard::isKeyPressed(Keyboard::Escape))
             gameState = gameState::menu;
@@ -318,7 +323,7 @@ int main()
             break;
         case reloadGame:
             titresY = 900;
-            currentLevel = 3;
+            currentLevel = 1;
             edward.lives = 3;
             mapInit(mapTextures, map, currentLevel);
             enemiesInit(meleeEnemies, rangeEnemies, currentLevel);
