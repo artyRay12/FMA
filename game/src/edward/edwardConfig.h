@@ -5,11 +5,15 @@
 using namespace sf;
 using namespace std;
 
+const EDWARD_INITIAL_LIVES = 3;
 const int EDWARD_INITIAL_HEALTH = 120;
 
 const Vector2f EDWARD_START_POS{100, 100};
 const Vector2f EDWARD_LIVES_COUNTER_POS{75, 75};
 const Vector2f EDWARD_HEALTH_BAR_POS{85, 80};
+
+const float EDWARD_SPEED_X = 0.3;
+const float EDWARD_SPEED_Y = -0.9;
 
 const int EDWARD_HEALTH_BAR_ROTATE = -90;
 

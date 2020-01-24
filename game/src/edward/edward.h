@@ -104,7 +104,7 @@ class Player
     Clock keyAdvice;
 
     int offsetX = 0, offsetY = 0;
-    int lives = 3;
+    int lives = EDWARD_INITIAL_LIVES;
     Vector2f enemyWhoDie;
 
     bool meleeAttack = false;
@@ -659,14 +659,14 @@ void updatesByMove(Player &edward)
 
 void edwardPressRightUpdates(Player &edward)
 {
-    edward.speedX = 0.3; //0.3;
+    edward.speedX = EDWARD_SPEED_X; //0.3;
     edward.sight = lineOfSight::right;
     edward.isEdwardGetDamage = false;
 }
 
 void edwardPressLeftUpdates(Player &edward)
 {
-    edward.speedX = -0.3; //-0.3;
+    edward.speedX = -EDWARD_SPEED_X; //-0.3;
     edward.sight = lineOfSight::left;
     edward.isEdwardGetDamage = false;
 }
@@ -678,7 +678,7 @@ void edwardPressUpUpdates(Player &edward)
     {
         edward.castCircleRightRect.left = 0;
         edward.castCircleLeftRect.left = 90;
-        edward.speedY = -0.4; // -0.38
+        edward.speedY = EDWARD_SPEED_Y; // -0.38
         edward.onGround = false;
         edward.meleeAttack = false;
         edward.jumpRightRect.left = 0;
