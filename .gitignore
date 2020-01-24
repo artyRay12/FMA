@@ -1,4 +1,10 @@
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/.cmaketools.json
+!.vscode/c_cpp_properties.json
 game/~build/
 CmakeFiles/
 cmake_install.cmake
