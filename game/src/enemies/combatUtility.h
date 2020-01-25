@@ -85,7 +85,7 @@ enemiesInit(vector<MeleeEnemy> &meleeEnemies, vector<RangeEnemy> &rangeEnemies, 
         meleeEnemies[i].ripTime.restart();
         meleeEnemies[i].deathLeftRect.left = 100;
         meleeEnemies[i].deathRightRect.left = 0;
-        meleeEnemies[i].state = enemyState::patrol;
+        meleeEnemies[i].state = EnemyState::patrol;
 
         rangeEnemies[i].sprite.setPosition(rangeEnemies[i].pos.x, rangeEnemies[i].pos.y);
         rangeEnemies[i].speedX = 0;

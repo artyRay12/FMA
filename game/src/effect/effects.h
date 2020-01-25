@@ -36,7 +36,7 @@ public:
   IntRect bloodSplatterLeftRect{50, 0, -50, 100};
 
   Clock effectsClock;
-  lineOfSight sight;
+  LineOfSight sight;
   Vector2f pos;
   float time = effectsClock.restart().asSeconds();
   bool startJump = false;
@@ -155,7 +155,7 @@ void effectsPressOneUpdates(Player edward, Effect &effectName)
 
 void circleUpdate(Effect &effectName, Player edward, float deltaTime)
 {
-  if (edward.sight == lineOfSight::right)
+  if (edward.sight == LineOfSight::right)
   {
     effectName.sprite.setPosition(edward.pos.x - edward.offsetX + 60, edward.pos.y - edward.offsetY - 10);
   }
@@ -176,7 +176,7 @@ void effectUpdate(Effect &dust, Effect &magicCircle, Player &edward, float delta
     if (edward.curPos.y >= 400)
       dust.pos.y -= edward.speedY * deltaTime;
 
-    if (dust.sight == lineOfSight::right)
+    if (dust.sight == LineOfSight::right)
     {
       dust.dustOffsetX = 70;
       dust.sprite.setPosition(dust.pos.x - dust.dustOffsetX, dust.pos.y);
@@ -217,7 +217,7 @@ void effectUpdate(Effect &dust, Effect &magicCircle, Player &edward, float delta
     if (edward.curPos.y >= 400)
       bloodSplatter.pos.y -= edward.speedY * deltaTime;
 
-    if (bloodSplatter.sight == lineOfSight::left)
+    if (bloodSplatter.sight == LineOfSight::left)
     {
       bloodSplatter.dustOffsetX = -150;
       bloodSplatter.bloodSplatterLeft();

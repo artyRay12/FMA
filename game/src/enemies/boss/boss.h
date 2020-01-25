@@ -5,7 +5,7 @@
 using namespace sf;
 using namespace std;
 
-enum bossState
+enum BossState
 {
     none,
     intro,
@@ -64,7 +64,7 @@ class Boss
     bool isPhase = false;
     bool isZoomed = false;
 
-    bossState state = bossState::none;
+    BossState state = BossState::none;
 
     IntRect introRect{BOSS_INTRO_SRPITE_SIZE};
 
@@ -79,8 +79,8 @@ class Boss
 
     IntRect phaseRect{BOSS_PHASE_CHANGE_SIZE};
 
-    lineOfSight sight = lineOfSight::right;
-    lineOfSight posRelative;
+    LineOfSight sight = LineOfSight::right;
+    LineOfSight posRelative;
 
     Clock bossTime;
     Clock hpLoseTimer;
@@ -113,7 +113,7 @@ void bossInit(Boss &boss)
     boss.alive = true;
     boss.health = 420;
     boss.phase = 0;
-    boss.state = bossState::none;
+    boss.state = BossState::none;
     boss.view.reset(sf::FloatRect(0, 0, 1440, 900));
 }
 
@@ -122,13 +122,13 @@ void updateByAnimations(Boss &boss)
     if ((boss.introRect.left == 1680))
     {
         boss.view.reset(sf::FloatRect(0, 0, 1440, 900));
-        boss.state = bossState::run;
+        boss.state = BossState::run;
         boss.introRect.left = 0;
     }
 
     if ((boss.view.getRotation() > 182) && (boss.phase == 0))
     {
-        boss.state = bossState::run;
+        boss.state = BossState::run;
         boss.phaseRect.left = 0;
         boss.view.setRotation(180);
         boss.health--;
@@ -138,13 +138,13 @@ void updateByAnimations(Boss &boss)
 
     if ((boss.view.getRotation() < 1) && (boss.phase == 1))
     {
-        boss.state = bossState::run;
+        boss.state = BossState::run;
         boss.health--;
         boss.view.reset(sf::FloatRect(0, 0, 1440, 900));
         boss.phase = 2;
     }
 
-    if (boss.sight == lineOfSight::right)
+    if (boss.sight == LineOfSight::right)
     {
         if (boss.legAttackRightRect.left >= 1600)
         {
@@ -171,38 +171,38 @@ void updateByAnimations(Boss &boss)
 void bossAnimation(Boss &boss)
 {
 
-    if (boss.state == bossState::intro)
+    if (boss.state == BossState::intro)
     {
         boss.animation(boss.introTexture, boss.introRect, 120, 1320, 1680, 0.2f);
     }
     if (boss.speedX != 0)
     {
-        if (boss.sight == lineOfSight::right)
+        if (boss.sight == LineOfSight::right)
             boss.animation(boss.runTexture, boss.runRightRect, 120, 0, 720, 0.1f);
-        if (boss.sight == lineOfSight::left)
+        if (boss.sight == LineOfSight::left)
             boss.animation(boss.runTexture, boss.runLeftRect, 120, 120, 840, 0.1f);
     }
 
-    if (boss.state == bossState::phaseChanger)
+    if (boss.state == BossState::phaseChanger)
     {
         boss.animation(boss.phaseTexture, boss.phaseRect, 180, 1620, 1980, 0.2f);
     }
 
-    if (boss.state == bossState::fight)
+    if (boss.state == BossState::fight)
     {
-        if (boss.sight == lineOfSight::right)
+        if (boss.sight == LineOfSight::right)
             //boss.legAttackRight();
             boss.animation(boss.legAttackTexture, boss.legAttackRightRect, 200, 0, 2800, 0.08f);
-        if (boss.sight == lineOfSight::left)
+        if (boss.sight == LineOfSight::left)
             //    boss.legAttackLeft();
             boss.animation(boss.legAttackTexture, boss.legAttackLeftRect, 200, 200, 3000, 0.08f);
     }
 
-    if (boss.state == bossState::stay)
+    if (boss.state == BossState::stay)
     {
-        if (boss.sight == lineOfSight::right)
+        if (boss.sight == LineOfSight::right)
             boss.animation(boss.standTexture, boss.standRightRect, 90, 0, 180, 0.2f);
-        if (boss.sight == lineOfSight::left)
+        if (boss.sight == LineOfSight::left)
             boss.animation(boss.standTexture, boss.standLeftRect, 90, 90, 270, 0.2f);
     }
 }
@@ -251,15 +251,15 @@ bool isPlayerNear(Player edward, Boss &boss)
     }
 }
 
-lineOfSight getRelativeSide(Player edward, Boss &boss)
+LineOfSight getRelativeSide(Player edward, Boss &boss)
 {
     if (edward.pos.x - boss.pos.x > 0)
     {
-        return lineOfSight::right;
+        return LineOfSight::right;
     }
     else
     {
-        return lineOfSight::left;
+        return LineOfSight::left;
     }
 }
 
@@ -267,10 +267,10 @@ bool isPlayerInAttackZone(Player edward, Boss &boss)
 {
     if (((boss.pos.x - edward.pos.x > -40) &&
          (boss.pos.x - edward.pos.x < 0) &&
-         (boss.sight == lineOfSight::right)) ||
+         (boss.sight == LineOfSight::right)) ||
         ((boss.pos.x - edward.pos.x < 80) &&
          (boss.pos.x - edward.pos.x > 0) &&
-         (boss.sight == lineOfSight::left)))
+         (boss.sight == LineOfSight::left)))
     {
         return true;
     }
@@ -282,18 +282,20 @@ bool isPlayerInAttackZone(Player edward, Boss &boss)
 
 void bossPositionUpdate(Boss &boss, Player edward, float deltaTime)
 {
-    if (boss.posRelative == lineOfSight::right)
+    if (boss.state == BossState::none)
+        boss.speedX = 0;
+    if (boss.posRelative == LineOfSight::right)
     {
-        boss.sight = lineOfSight::right;
+        boss.sight = LineOfSight::right;
         boss.pos.x += boss.speedX * deltaTime;
     }
     else
     {
-        boss.sight = lineOfSight::left;
+        boss.sight = LineOfSight::left;
         boss.pos.x -= boss.speedX * deltaTime;
     }
 
-    if (boss.state == bossState::intro)
+    if (boss.state == BossState::intro)
     {
         boss.sprite.setPosition(boss.pos.x - edward.offsetX, boss.pos.y - edward.offsetY + 100);
     }
@@ -337,6 +339,7 @@ void zoomScene(Boss &boss, Player edward, float deltaTime)
 
 void phaseChangerMode(Boss &boss, Player edward, float deltaTime)
 {
+    boss.speedX = 0;
     switch (boss.phase)
     {
     case 0:
@@ -365,13 +368,13 @@ void runMode(Boss &boss, Player edward, float deltaTime)
     boss.speedX = BOSS_SPEEDX;
     if (isPlayerInAttackZone(edward, boss))
     {
-        boss.state = bossState::fight;
+        boss.state = BossState::fight;
     }
 
     if (!isPlayerNear(edward, boss))
     {
         boss.isBossActive = false;
-        boss.state = bossState::stay;
+        boss.state = BossState::stay;
     }
     else
     {
@@ -384,7 +387,7 @@ void stayMode(Boss &boss, Player edward)
     boss.speedX = 0;
     if (isPlayerNear(edward, boss))
     {
-        boss.state = bossState::run;
+        boss.state = BossState::run;
     }
 }
 
@@ -393,7 +396,7 @@ void fightMode(Boss &boss, Player edward)
     boss.speedX = 0;
     if ((!isPlayerInAttackZone(edward, boss)) && (boss.legAttackLeftRect.left == 200 && boss.legAttackRightRect.left == 0))
     {
-        boss.state = bossState::run;
+        boss.state = BossState::run;
     }
 }
 
@@ -405,7 +408,7 @@ void bossHitCheck(Player &edward, Boss &boss)
         if ((edward.pos.x - boss.pos.x < 100) &&
             (edward.pos.x - boss.pos.x > 10))
         {
-            if ((edward.hitConfirm) && (edward.sight == lineOfSight::left))
+            if ((edward.hitConfirm) && (edward.sight == LineOfSight::left))
             {
                 edward.isEdwardHitEnemy = true;
                 edward.enemyWhoDie.x = boss.pos.x - edward.offsetX;
@@ -423,7 +426,7 @@ void bossHitCheck(Player &edward, Boss &boss)
         else if ((edward.pos.x - boss.pos.x < 10) &&
                  (edward.pos.x - boss.pos.x > -100))
         {
-            if ((edward.hitConfirm) && (edward.sight == lineOfSight::right))
+            if ((edward.hitConfirm) && (edward.sight == LineOfSight::right))
             {
                 edward.isEdwardHitEnemy = true;
                 edward.enemyWhoDie.x = boss.pos.x - edward.offsetX;
@@ -460,12 +463,12 @@ void updateByHealth(Boss &boss)
 
     if (boss.health == 330)
     {
-        boss.state = bossState::phaseChanger;
+        boss.state = BossState::phaseChanger;
     }
 
     if (boss.health == 209)
     {
-        boss.state = bossState::phaseChanger;
+        boss.state = BossState::phaseChanger;
     }
 
     if (boss.health == 118)
@@ -482,7 +485,7 @@ void updateByHealth(Boss &boss)
 void bossUpdate(Player &edward, Boss &boss, float deltaTime)
 {
 
-    lineOfSight state = getRelativeSide(edward, boss);
+    LineOfSight state = getRelativeSide(edward, boss);
     if (state != boss.posRelative)
     {
         boss.legAttackLeftRect.left = 200;
@@ -504,7 +507,7 @@ void bossUpdate(Player &edward, Boss &boss, float deltaTime)
     {
     case none:
         if (isPlayerNear(edward, boss))
-            boss.state = bossState::intro;
+            boss.state = BossState::intro;
         break;
     case intro:
         introMode(boss);

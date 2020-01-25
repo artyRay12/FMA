@@ -1,8 +1,9 @@
-
 #include "src/edward/edward.h"
 #include "src/effect/effects.h"
 #include "src/enemies/combatUtility.h"
 #include "src/map/mapController.h"
+#include "src/gameState/gameStateController.h"
+#include "src/gameState/gameState.h"
 
 #define BLOCK_SIZE 32;
 
@@ -12,18 +13,7 @@ using namespace sf;
 constexpr unsigned ANTIALIASING_LEVEL = 8;
 constexpr unsigned WINDOW_WIDTH = 1480;
 constexpr unsigned WINDOW_HEIGHT = 900;
-
-enum gameState
-{
-    menu,
-    instructions,
-    reloadGame,
-    gameRun,
-    pause,
-    dead,
-    gameOver,
-    endGame
-};
+const int GAME_SPEED = 800;
 
 void createWindow(RenderWindow &window)
 {
@@ -34,7 +24,7 @@ void createWindow(RenderWindow &window)
         "FullMetal Alchiemist", sf::Style::Default, settings);
 }
 
-void pollEvents(sf::RenderWindow &window, Player &edward, gameState &gameState)
+void pollEvents(sf::RenderWindow &window, Player &edward)
 {
     Event event;
     while (window.pollEvent(event))
@@ -47,17 +37,44 @@ void pollEvents(sf::RenderWindow &window, Player &edward, gameState &gameState)
     }
 }
 
-void render(RenderWindow &window, Player &edward, Map &map, Effect &dust, Effect &magicCircle, vector<MeleeEnemy> &meleeEnemys, vector<RangeEnemy> &rangeEnemies, Sprite &playerFrame, int currentLevel, Effect &bloodSplatter, Boss &boss)
+void render(RenderWindow &window, Player &edward, Map &map, Effect &dust, Effect &magicCircle, vector<MeleeEnemy> &meleeEnemys, vector<RangeEnemy> &rangeEnemies, Sprite &playerFrame, int currentLevel, Effect &bloodSplatter, Boss &boss, gameBackgrounds &gameBackgrounds, GameState &gameState)
 {
-    window.clear();
-    drawMap(window, map, edward, currentLevel);
-    drawEffect(window, dust, magicCircle, bloodSplatter);
-    drawMeleeEnemy(window, meleeEnemys, edward);
-    drawRangeEnemy(window, rangeEnemies, edward);
-    bossDraw(window, boss);
-    window.draw(playerFrame);
-    drawPlayer(window, edward);
-    window.draw(playerFrame);
+    if (gameState != GameState::pause)
+        window.clear();
+    switch (gameState)
+    {
+    case menu:
+        window.draw(gameBackgrounds.mainMenu);
+        break;
+    case instructions:
+        window.draw(gameBackgrounds.instructions);
+        break;
+    case endGame:
+        boss.view.reset(FloatRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT));
+        window.setView(boss.view);
+        window.draw(gameBackgrounds.endGame);
+        window.draw(gameBackgrounds.titres);
+        break;
+    case pause:
+        boss.view.reset(FloatRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT));
+        window.draw(gameBackgrounds.darkPause);
+        window.draw(gameBackgrounds.pause);
+        break;
+    case gameOver:
+        boss.view.reset(FloatRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT));
+        window.setView(boss.view);
+        window.draw(gameBackgrounds.gameOver);
+        break;
+    case gameRun:
+        drawMap(window, map, edward, currentLevel);
+        drawEffect(window, dust, magicCircle, bloodSplatter);
+        drawMeleeEnemy(window, meleeEnemys, edward);
+        drawRangeEnemy(window, rangeEnemies, edward);
+        bossDraw(window, boss);
+        window.draw(playerFrame);
+        drawPlayer(window, edward);
+        window.draw(playerFrame);
+    }
     window.display();
 }
 
@@ -92,56 +109,12 @@ void pressKeyUpdate(Player &edward, Effect &dust, Effect &magicCircle, Effect &b
     }
 }
 
-void gameEndChecker(Boss boss, gameState &gameState)
+void gameEndChecker(Boss boss, GameState &gameState)
 {
     if (!boss.alive)
     {
-        gameState = gameState::endGame;
-        boss.state = bossState::none;
-    }
-}
-
-void menuUpdate(gameState &gameState, Clock &deltaTime)
-{
-    switch (gameState)
-    {
-    case menu:
-        if (Keyboard::isKeyPressed(Keyboard::Return))
-            gameState = gameState::reloadGame;
-        if (Keyboard::isKeyPressed(Keyboard::Space))
-            gameState = gameState::instructions;
-        break;
-
-    case instructions:
-        if ((Keyboard::isKeyPressed(Keyboard::BackSpace)) || (Keyboard::isKeyPressed(Keyboard::Escape)))
-            gameState = gameState::menu;
-        break;
-
-    case gameRun:
-        if (Keyboard::isKeyPressed(Keyboard::Escape) && deltaTime.getElapsedTime().asSeconds() > 0.2)
-        {
-            gameState = gameState::pause;
-            deltaTime.restart();
-        }
-        break;
-
-    case pause:
-        if (Keyboard::isKeyPressed(Keyboard::Escape) && deltaTime.getElapsedTime().asSeconds() > 0.2)
-        {
-            gameState = gameState::gameRun;
-            deltaTime.restart();
-        }
-        break;
-
-    case endGame:
-        if (Keyboard::isKeyPressed(Keyboard::Escape))
-            gameState = gameState::menu;
-        break;
-        
-    case gameOver:
-        if (Keyboard::isKeyPressed(Keyboard::Escape))
-            gameState = gameState::menu;
-        break;
+        gameState = GameState::endGame;
+        boss.state = BossState::none;
     }
 }
 
@@ -160,7 +133,7 @@ void levelChanger(int &currentLevel, Player &edward, Map &map, Clock &levelChang
     }
 }
 
-void deathChecker(int &currentLevel, Player &edward, Map &map, vector<MeleeEnemy> &meleeEnemies, vector<RangeEnemy> &rangeEnemies, std::map<String, Texture> &mapTextures, gameState &gameState)
+void deathChecker(int &currentLevel, Player &edward, Map &map, vector<MeleeEnemy> &meleeEnemies, vector<RangeEnemy> &rangeEnemies, std::map<String, Texture> &mapTextures, GameState &gameState)
 {
     if (edward.health == 0)
     {
@@ -185,11 +158,11 @@ void deathChecker(int &currentLevel, Player &edward, Map &map, vector<MeleeEnemy
 
     if (edward.lives == 0)
     {
-        gameState = gameState::gameOver;
+        gameState = GameState::gameOver;
     }
 }
 
-void update(float deltaTime, Player &edward, Effect &dust, Effect &magicCircle, vector<MeleeEnemy> &meleeEnemies, vector<RangeEnemy> &rangeEnemies, Map &map, int &currentLevel, Effect &bloodSplatter, Boss &boss, gameState &gameState, std::map<String, Texture> &mapTextures)
+void update(float deltaTime, Player &edward, Effect &dust, Effect &magicCircle, vector<MeleeEnemy> &meleeEnemies, vector<RangeEnemy> &rangeEnemies, Map &map, int &currentLevel, Effect &bloodSplatter, Boss &boss, GameState &gameState, std::map<String, Texture> &mapTextures)
 {
     deathChecker(currentLevel, edward, map, meleeEnemies, rangeEnemies, mapTextures, gameState);
     effectUpdate(dust, magicCircle, edward, deltaTime, bloodSplatter);
@@ -208,19 +181,24 @@ int main()
     createWindow(window);
     Clock timer;
     int currentLevel = 1;
-    gameState gameState = gameState::menu;
+    GameState gameState = GameState::menu;
     Clock levelChangerTimer;
     Clock gameStateTimer;
-    float gameSpeed = 800;
+    float gameSpeed = GAME_SPEED;
+
+    map<String, Texture> gameBackgroundTextures = getGameBackgroundTextures();
+    struct gameBackgrounds gameBackgrounds;
+    gameBackgroundsInit(gameBackgrounds, gameBackgroundTextures);
 
     /* ВРАГИ */
     map<String, Texture> meleeEnemyTextures = getMeleeEnemyTextures();
     map<String, Texture> rangeEnemyTextures = getRangeEnemyTextures();
-    map<String, Texture> bossTextures = getBossTextures();
+
     vector<MeleeEnemy> meleeEnemies(6, meleeEnemyTextures);
     vector<RangeEnemy> rangeEnemies(6, rangeEnemyTextures);
 
     /* БОСС */
+    map<String, Texture> bossTextures = getBossTextures();
     Boss boss(bossTextures);
 
     /* ИГРОК */
@@ -245,102 +223,37 @@ int main()
     Sprite playerFrame;
     Texture playerFrameTexture;
 
-    Sprite menuImage;
-    Texture menuImageTexture;
-    menuImageTexture.loadFromFile("game/wallPaper/menu-screen.png");
-    menuImage.setTexture(menuImageTexture);
-
-    Sprite instructionImage;
-    Texture instructionTexture;
-    instructionTexture.loadFromFile("game/wallPaper/insructions-screen.png");
-    instructionImage.setTexture(instructionTexture);
-
-    Sprite pauseScreen;
-    Texture pauseScreenTexture;
-    pauseScreenTexture.loadFromFile("game/wallPaper/pause-screen.png");
-    pauseScreen.setTexture(pauseScreenTexture);
-
-    Sprite gameOverScreen;
-    Texture gameOverScreenTexture;
-    gameOverScreenTexture.loadFromFile("game/wallPaper/game-over.jpg");
-    gameOverScreen.setTexture(gameOverScreenTexture);
-
-    RectangleShape darkTheme;
-    darkTheme.setSize({2000, 2000});
-    darkTheme.setFillColor(Color(0, 0, 0, 2));
-
-    Sprite endGameImage;
-    Texture endGameTexture;
-    endGameTexture.loadFromFile("game/wallPaper/end-game-screen.png"); //test.png
-    endGameImage.setTexture(endGameTexture);
-
-    Sprite titres;
-    Texture titresTexture;
-    titresTexture.loadFromFile("game/wallPaper/titres.png");
-    titres.setTexture(titresTexture);
-
-    playerFrameTexture.loadFromFile("game/sprites/Interface/player-frame.png");
-    playerFrame.setTexture(playerFrameTexture);
-
-    float titresY = 900;
+    float titresY = TITRES_INITIAL_POS_Y;
 
     while (window.isOpen())
     {
         switch (gameState)
         {
-        case menu:
-            timer.restart();
-            window.clear();
-            window.draw(menuImage);
-            window.display();
-            break;
-        case instructions:
-            timer.restart();
-            window.clear();
-            window.draw(instructionImage);
-            window.display();
-            break;
         case endGame:
-            timer.restart();
-            titres.setPosition(800, titresY);
-            titresY = titresY - 0.03;
-            window.clear();
-            window.draw(endGameImage);
-            window.draw(titres);
-            window.display();
+            titresY = titresY - TITRES_SPEED * timer.getElapsedTime().asSeconds();
+            gameBackgrounds.titres.setPosition(TITRES_INITIAL_POS_X, titresY);
             break;
-        case pause:
-            window.draw(darkTheme);
-            window.draw(pauseScreen);
-            window.display();
-            timer.restart();
-            break;
-        case gameOver:
-            boss.view.reset(FloatRect(0, 0, 1440, 900));
-            window.draw(gameOverScreen);
-            window.setView(boss.view);
-            window.display();
-            break;
+
         case reloadGame:
-            titresY = 900;
+            titresY = TITRES_INITIAL_POS_Y;
             currentLevel = 1;
-            edward.lives = 3;
+            edward.lives = EDWARD_INITIAL_LIVES;
             mapInit(mapTextures, map, currentLevel);
             enemiesInit(meleeEnemies, rangeEnemies, currentLevel);
             bossInit(boss);
             edwardInit(edward);
-            gameState = gameState::gameRun;
+            gameState = GameState::gameRun;
             break;
         case gameRun:
             levelChanger(currentLevel, edward, map, levelChangerTimer, meleeEnemies, rangeEnemies, mapTextures);
             float time = timer.getElapsedTime().asMicroseconds();
-            timer.restart();
             time = time / gameSpeed;
             update(time, edward, dust, magicCircle, meleeEnemies, rangeEnemies, map, currentLevel, bloodSplatter, boss, gameState, mapTextures);
-            render(window, edward, map, dust, magicCircle, meleeEnemies, rangeEnemies, playerFrame, currentLevel, bloodSplatter, boss);
             break;
         }
-        menuUpdate(gameState, gameStateTimer);
-        pollEvents(window, edward, gameState);
+        timer.restart();
+        render(window, edward, map, dust, magicCircle, meleeEnemies, rangeEnemies, playerFrame, currentLevel, bloodSplatter, boss, gameBackgrounds, gameState);
+        gameStateUpdateByKeyPress(gameState, gameStateTimer);
+        pollEvents(window, edward);
     }
 }

@@ -4,13 +4,13 @@
 using namespace sf;
 using namespace std;
 
-enum lineOfSight
+enum LineOfSight
 {
     right,
     left
 };
 
-enum cannonState
+enum CannonState
 {
     uncast,
     casting,
@@ -22,6 +22,7 @@ class Player
   public:
     Player(map<String, Texture> &playerTextures)
     {
+        playerFrameTexture = &playerTextures["frame"];
         standTexture = &playerTextures["stand"];
         runTexture = &playerTextures["run"];
         jumpTexture = &playerTextures["jump"];
@@ -37,11 +38,12 @@ class Player
         live3Texture = &playerTextures["live3"];
     }
 
-    Vector2f startPos = {EDWARD_START_POS}; // 12800 100
-    Vector2f pos;                           //5900 1200
+    Vector2f startPos = {EDWARD_START_POS};
+    Vector2f pos;
     Vector2f curPos;
     Vector2f shellPos;
 
+    Texture *playerFrameTexture;
     Texture *standTexture;
     Texture *runTexture;
     Texture *jumpTexture;
@@ -84,9 +86,9 @@ class Player
 
     IntRect shellRect{SHELL_SIZE};
 
-    lineOfSight sight = lineOfSight::right;
-    lineOfSight sightSaved = lineOfSight::right;
-    cannonState cannonState = cannonState::uncast;
+    LineOfSight sight = LineOfSight::right;
+    LineOfSight sightSaved = LineOfSight::right;
+    CannonState cannonState = CannonState::uncast;
 
     Sprite sprite;
     Sprite spell;
@@ -95,6 +97,7 @@ class Player
     Sprite keyHelper;
     Sprite liveIcon;
     Sprite livesImage;
+    Sprite playerFrame;
 
     Clock clock;
     Clock hpLoseTimer;
@@ -354,7 +357,7 @@ class Player
         {
             if (cannonRigthRect.left == 840)
             {
-                cannonState = cannonState::uncast;
+                cannonState = CannonState::uncast;
                 cannonRigthRect.left = 0;
             }
             else
@@ -373,7 +376,7 @@ class Player
         {
             if (cannonLeftRect.left == 980)
             {
-                cannonState = cannonState::uncast;
+                cannonState = CannonState::uncast;
                 cannonLeftRect.left = 140;
             }
             else
@@ -416,16 +419,24 @@ void edwardInit(Player &edward)
     edward.isEdwardGetDamage = false;
     edward.sprite.setPosition(edward.startPos);
     edward.pos = edward.sprite.getPosition();
+
+    edward.playerFrame.setTexture(*edward.playerFrameTexture);
+
     edward.healthBar.setSize({15, edward.health});
     edward.healthBar.setPosition({EDWARD_HEALTH_BAR_POS});
     edward.healthBar.setFillColor(Color::Green);
     edward.healthBar.setRotation(EDWARD_HEALTH_BAR_ROTATE);
+
     edward.keyHelper.setTexture((*edward.keyHelperTexture));
 }
 
 map<String, Texture> getPlayerTextures()
 {
     map<String, Texture> playerTextures;
+
+    Texture playerFrame;
+    playerFrame.loadFromFile("game/sprites/Interface/player-Frame.png");
+
     Texture stand;
     stand.loadFromFile("game/sprites/Edward/edward-stand.png");
 
@@ -465,6 +476,7 @@ map<String, Texture> getPlayerTextures()
     Texture live3;
     live3.loadFromFile("game/sprites/Interface/lives-3.png");
 
+    playerTextures.emplace("frame", playerFrame);
     playerTextures.emplace("stand", stand);
     playerTextures.emplace("run", run);
     playerTextures.emplace("jump", jump);
@@ -509,9 +521,9 @@ void edwardAnimations(Player &edward)
         edward.shellFlying();
     }
 
-    if (edward.cannonState == cannonState::ready)
+    if (edward.cannonState == CannonState::ready)
     {
-        if (edward.sight == lineOfSight::right)
+        if (edward.sight == LineOfSight::right)
         {
             edward.cannon.setScale(1, 1);
             edward.cannonShootingRight();
@@ -526,7 +538,7 @@ void edwardAnimations(Player &edward)
     {
         if (edward.canIJumpAttack == true)
         {
-            if (edward.sight == lineOfSight::right)
+            if (edward.sight == LineOfSight::right)
             {
                 edward.jumpAttackRight();
             }
@@ -537,7 +549,7 @@ void edwardAnimations(Player &edward)
         }
         else
         {
-            if (edward.sight == lineOfSight::right)
+            if (edward.sight == LineOfSight::right)
             {
                 edward.jumpRight();
             }
@@ -551,7 +563,7 @@ void edwardAnimations(Player &edward)
     {
         if (edward.meleeAttack == true)
         {
-            if (edward.sight == lineOfSight::right)
+            if (edward.sight == LineOfSight::right)
             {
                 edward.circleHitRight();
             }
@@ -582,7 +594,7 @@ void edwardAnimations(Player &edward)
                     {
                         if (edward.isEdwardGetDamage)
                         {
-                            if (edward.sight == lineOfSight::right)
+                            if (edward.sight == LineOfSight::right)
                             {
                                 edward.getDamageLeft();
                             }
@@ -595,7 +607,7 @@ void edwardAnimations(Player &edward)
                         else
                         {
 
-                            if (edward.sight == lineOfSight::right)
+                            if (edward.sight == LineOfSight::right)
                             {
                                 edward.animation(edward.standTexture, edward.standRightRect, 50, 0, 250, 0.20);
                                 // edward.standRight();
@@ -609,7 +621,7 @@ void edwardAnimations(Player &edward)
                     }
                     else
                     {
-                        if (edward.sight == lineOfSight::right)
+                        if (edward.sight == LineOfSight::right)
                         {
                             edward.castCircleRight();
                         }
@@ -639,7 +651,7 @@ void updatesByMove(Player &edward)
 
         edward.canICastCircle = false;
 
-        edward.cannonState = cannonState::uncast;
+        edward.cannonState = CannonState::uncast;
     }
 
     if (edward.speedY == 0)
@@ -660,14 +672,14 @@ void updatesByMove(Player &edward)
 void edwardPressRightUpdates(Player &edward)
 {
     edward.speedX = EDWARD_SPEED_X; //0.3;
-    edward.sight = lineOfSight::right;
+    edward.sight = LineOfSight::right;
     edward.isEdwardGetDamage = false;
 }
 
 void edwardPressLeftUpdates(Player &edward)
 {
     edward.speedX = -EDWARD_SPEED_X; //-0.3;
-    edward.sight = lineOfSight::left;
+    edward.sight = LineOfSight::left;
     edward.isEdwardGetDamage = false;
 }
 
@@ -707,7 +719,7 @@ void edwardPressOneUpdates(Player &edward)
 {
     edward.canICastCircle = true;
     edward.isEdwardGetDamage = false;
-    edward.cannonState = cannonState::casting;
+    edward.cannonState = CannonState::casting;
 }
 
 void collision(int dir, Player &edward, String *&solidPtr, float blockSize, int &currentLevel)
@@ -791,9 +803,9 @@ void updatesByAnimation(Player &edward)
 void spellUpdates(Player &edward, float deltaTime)
 {
     /* ПУШКА */
-    if ((edward.cannonState == cannonState::casting) && (edward.castCircleLeftRect.left == 810 || edward.castCircleRightRect.left == 720))
+    if ((edward.cannonState == CannonState::casting) && (edward.castCircleLeftRect.left == 810 || edward.castCircleRightRect.left == 720))
     {
-        if (edward.sight == lineOfSight::right)
+        if (edward.sight == LineOfSight::right)
         {
             edward.cannon.setPosition(edward.pos.x - edward.offsetX + 120, edward.pos.y - edward.offsetY);
         }
@@ -802,13 +814,13 @@ void spellUpdates(Player &edward, float deltaTime)
             edward.cannon.setPosition(edward.pos.x - edward.offsetX - 60, edward.pos.y - edward.offsetY);
         }
 
-        edward.cannonState = cannonState::ready;
+        edward.cannonState = CannonState::ready;
     }
 
     /*СНАРЯД */
     if (edward.isShellFlying)
     {
-        if (edward.sightSaved == lineOfSight::right)
+        if (edward.sightSaved == LineOfSight::right)
         {
             edward.shellPos.x += 1 * deltaTime;
         }
@@ -868,9 +880,10 @@ void drawPlayer(sf::RenderWindow &window, Player edward)
     }
     window.draw(edward.sprite);
     window.draw(edward.healthBar);
-    if (edward.cannonState == cannonState::ready)
+    if (edward.cannonState == CannonState::ready)
         window.draw(edward.cannon);
     if (edward.isShellFlying)
         window.draw(edward.shell);
     window.draw(edward.livesImage);
+    window.draw(edward.playerFrame);
 }

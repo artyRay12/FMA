@@ -41,10 +41,10 @@ class RangeEnemy
     IntRect fireBallRightRect{FIREBALL_RIGHT_SIZE};
     IntRect fireBallLeftRect{FIREBALL_LEFT_SIZE};
 
-    enemyState state = enemyState::patrol;
+    EnemyState state = EnemyState::patrol;
 
-    lineOfSight sight = lineOfSight::right;
-    lineOfSight posRelative;
+    LineOfSight sight = LineOfSight::right;
+    LineOfSight posRelative;
 
     Clock ripTime;
     Clock rangeEnemyTime;
@@ -198,15 +198,15 @@ void updatesByAnimation(RangeEnemy &rangeEnemy)
     }
 }
 
-lineOfSight getRangeEnemySightDir(Player edward, RangeEnemy &rangeEnemy)
+LineOfSight getRangeEnemySightDir(Player edward, RangeEnemy &rangeEnemy)
 {
     if (rangeEnemy.pos.x - edward.pos.x > 0)
     {
-        return lineOfSight::left;
+        return LineOfSight::left;
     }
     else
     {
-        return lineOfSight::right;
+        return LineOfSight::right;
     }
 }
 
@@ -227,7 +227,7 @@ void rangeEnemyAnimation(Player edward, float deltaTime, RangeEnemy &rangeEnemy)
 
     if (rangeEnemy.deathAnimation)
     {
-        if (rangeEnemy.sight = lineOfSight::right)
+        if (rangeEnemy.sight = LineOfSight::right)
             rangeEnemy.deathRight();
         else
             rangeEnemy.deathLeft();
@@ -236,7 +236,7 @@ void rangeEnemyAnimation(Player edward, float deltaTime, RangeEnemy &rangeEnemy)
     {
         if (rangeEnemy.attackZone)
         {
-            if (rangeEnemy.sight == lineOfSight::right)
+            if (rangeEnemy.sight == LineOfSight::right)
             {
                 rangeEnemy.animation(rangeEnemy.attackTexture, rangeEnemy.attackRightRect, 70, 0, 420, 0.2);
             }
@@ -247,7 +247,7 @@ void rangeEnemyAnimation(Player edward, float deltaTime, RangeEnemy &rangeEnemy)
         }
         else
         {
-            if (rangeEnemy.sight == lineOfSight::right)
+            if (rangeEnemy.sight == LineOfSight::right)
             {
                 rangeEnemy.animation(rangeEnemy.standTexture, rangeEnemy.standRightRect, 70, 0, 770, 0.1);
             }
@@ -306,7 +306,7 @@ void fireballDataUpdate(Player edward, RangeEnemy &rangeEnemy)
 
 void fireBallMovingUpdate(Player &edward, float deltaTime, RangeEnemy &rangeEnemy, String *mapPtr)
 {
-    if (rangeEnemy.posRelative == lineOfSight::left)
+    if (rangeEnemy.posRelative == LineOfSight::left)
     {
         rangeEnemy.fireBallFlyingLeft();
     }
@@ -334,7 +334,7 @@ void rangehitCheck(Player &edward, RangeEnemy &rangeEnemy)
         (rangeEnemy.pos.y - edward.pos.y < 40))
     {
         if ((edward.pos.x - rangeEnemy.pos.x < 100) &&
-            (edward.pos.x - rangeEnemy.pos.x > 10) && (edward.sight == lineOfSight::left) && (edward.hitConfirm))
+            (edward.pos.x - rangeEnemy.pos.x > 10) && (edward.sight == LineOfSight::left) && (edward.hitConfirm))
         {
             edward.isEdwardHitEnemy = true;
             edward.enemyWhoDie = rangeEnemy.sprite.getPosition();
@@ -343,7 +343,7 @@ void rangehitCheck(Player &edward, RangeEnemy &rangeEnemy)
         }
 
         else if ((edward.pos.x - rangeEnemy.pos.x < 10) &&
-                 (edward.pos.x - rangeEnemy.pos.x > -100) && (edward.sight == lineOfSight::right) && (edward.hitConfirm))
+                 (edward.pos.x - rangeEnemy.pos.x > -100) && (edward.sight == LineOfSight::right) && (edward.hitConfirm))
         {
             edward.isEdwardHitEnemy = true;
             edward.enemyWhoDie = rangeEnemy.sprite.getPosition();

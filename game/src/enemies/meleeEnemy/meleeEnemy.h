@@ -4,7 +4,7 @@
 using namespace sf;
 using namespace std;
 
-enum enemyState
+enum EnemyState
 {
     patrol,
     stand,
@@ -42,13 +42,13 @@ class MeleeEnemy
     IntRect deathRightRect{DEATH_RIGHT_SIZE};
     IntRect deathLeftRect{DEATH_LEFT_SIZE};
 
-    enemyState state = enemyState::patrol;
-    lineOfSight sight = lineOfSight::right;
+    EnemyState state = EnemyState::patrol;
+    LineOfSight sight = LineOfSight::right;
 
     Clock ripTime;
     Clock patrolTime;
     Clock meleeEnemyTime;
-    lineOfSight posRelative;
+    LineOfSight posRelative;
 
     bool alive = true;
     bool attackZone = false;
@@ -170,10 +170,10 @@ bool isPlayerInAttackZone(Player edward, MeleeEnemy &meleeEnemy)
 {
     if (((meleeEnemy.pos.x - edward.pos.x > -70) &&
          (meleeEnemy.pos.x - edward.pos.x < 0) &&
-         (meleeEnemy.sight == lineOfSight::right)) ||
+         (meleeEnemy.sight == LineOfSight::right)) ||
         ((meleeEnemy.pos.x - edward.pos.x < 70) &&
          (meleeEnemy.pos.x - edward.pos.x > 0) &&
-         (meleeEnemy.sight == lineOfSight::left)))
+         (meleeEnemy.sight == LineOfSight::left)))
     {
         return true;
     }
@@ -188,15 +188,15 @@ String *getMap(String *arr)
     return arr;
 }
 
-lineOfSight getRelativeSide(Player edward, MeleeEnemy &meleeEnemy)
+LineOfSight getRelativeSide(Player edward, MeleeEnemy &meleeEnemy)
 {
     if (edward.pos.x - meleeEnemy.pos.x > 0)
     {
-        return lineOfSight::right;
+        return LineOfSight::right;
     }
     else
     {
-        return lineOfSight::left;
+        return LineOfSight::left;
     }
 }
 
@@ -207,7 +207,7 @@ void meleehitCheck(Player &edward, MeleeEnemy &meleeEnemy)
         (meleeEnemy.pos.y - edward.pos.y < 40))
     {
         if ((edward.pos.x - meleeEnemy.pos.x < 100) &&
-            (edward.pos.x - meleeEnemy.pos.x > 10) && (edward.sight == lineOfSight::left) && (edward.hitConfirm))
+            (edward.pos.x - meleeEnemy.pos.x > 10) && (edward.sight == LineOfSight::left) && (edward.hitConfirm))
 
         {
             edward.isEdwardHitEnemy = true;
@@ -215,18 +215,18 @@ void meleehitCheck(Player &edward, MeleeEnemy &meleeEnemy)
             edward.enemyWhoDie.y = meleeEnemy.pos.y - edward.offsetY;
             meleeEnemy.deathAnimation = true;
             edward.hitConfirm = false;
-            meleeEnemy.state = enemyState::death;
+            meleeEnemy.state = EnemyState::death;
         }
 
         else if ((edward.pos.x - meleeEnemy.pos.x < 10) &&
-                 (edward.pos.x - meleeEnemy.pos.x > -100) && (edward.sight == lineOfSight::right) && (edward.hitConfirm))
+                 (edward.pos.x - meleeEnemy.pos.x > -100) && (edward.sight == LineOfSight::right) && (edward.hitConfirm))
         {
             edward.isEdwardHitEnemy = true;
             edward.enemyWhoDie.x = meleeEnemy.pos.x - edward.offsetX;
             edward.enemyWhoDie.y = meleeEnemy.pos.y - edward.offsetY;
             meleeEnemy.deathAnimation = true;
             edward.hitConfirm = false;
-            meleeEnemy.state = enemyState::death;
+            meleeEnemy.state = EnemyState::death;
         }
     }
 
@@ -240,7 +240,7 @@ void meleehitCheck(Player &edward, MeleeEnemy &meleeEnemy)
         edward.enemyWhoDie.x = meleeEnemy.pos.x - edward.offsetX;
         edward.enemyWhoDie.y = meleeEnemy.pos.y - edward.offsetY;
         meleeEnemy.deathAnimation = true;
-        meleeEnemy.state = enemyState::death;
+        meleeEnemy.state = EnemyState::death;
     }
 
     if (meleeEnemy.hitConfirm)
@@ -291,7 +291,7 @@ void meleeEnemyAnimation(MeleeEnemy &meleeEnemy)
 
     if (meleeEnemy.deathAnimation)
     {
-        if (meleeEnemy.sight == lineOfSight::left)
+        if (meleeEnemy.sight == LineOfSight::left)
         {
             meleeEnemy.deathRight();
         }
@@ -317,7 +317,7 @@ void meleeEnemyAnimation(MeleeEnemy &meleeEnemy)
         {
             if (meleeEnemy.attackZone)
             {
-                if (meleeEnemy.sight == lineOfSight::right)
+                if (meleeEnemy.sight == LineOfSight::right)
                 {
                     meleeEnemy.attackRight();
                 }
@@ -328,7 +328,7 @@ void meleeEnemyAnimation(MeleeEnemy &meleeEnemy)
             }
             else
             {
-                if (meleeEnemy.sight == lineOfSight::right)
+                if (meleeEnemy.sight == LineOfSight::right)
                 {
                     meleeEnemy.animation(meleeEnemy.standTexture, meleeEnemy.attackRightRect, 60, 0, 300, 0.2);
                 }
@@ -344,15 +344,15 @@ void meleeEnemyAnimation(MeleeEnemy &meleeEnemy)
 void patrolMode(Player edward, float deltaTime, MeleeEnemy &meleeEnemy)
 {
     if (meleeEnemy.speedX == 0)
-        meleeEnemy.sight == lineOfSight::right ? meleeEnemy.speedX = 0.1 : meleeEnemy.speedX = -0.1;
+        meleeEnemy.sight == LineOfSight::right ? meleeEnemy.speedX = 0.1 : meleeEnemy.speedX = -0.1;
 
     if (meleeEnemy.speedX > 0)
     {
-        meleeEnemy.sight = lineOfSight::right;
+        meleeEnemy.sight = LineOfSight::right;
     }
     else
     {
-        meleeEnemy.sight = lineOfSight::left;
+        meleeEnemy.sight = LineOfSight::left;
     }
 
     if (!meleeEnemy.deathAnimation)
@@ -360,7 +360,7 @@ void patrolMode(Player edward, float deltaTime, MeleeEnemy &meleeEnemy)
 
     if (isPlayerNear(edward, meleeEnemy))
     {
-        meleeEnemy.state = enemyState::combat;
+        meleeEnemy.state = EnemyState::combat;
     }
 
     meleeEnemy.sprite.setPosition(meleeEnemy.pos.x - edward.offsetX, meleeEnemy.pos.y - edward.offsetY);
@@ -371,7 +371,7 @@ void combatMode(Player &edward, float deltaTime, MeleeEnemy &meleeEnemy)
 
     if (!isPlayerNear(edward, meleeEnemy))
     {
-        meleeEnemy.state = enemyState::patrol;
+        meleeEnemy.state = EnemyState::patrol;
     }
 
     if (isPlayerInAttackZone(edward, meleeEnemy))
@@ -386,15 +386,15 @@ void combatMode(Player &edward, float deltaTime, MeleeEnemy &meleeEnemy)
         meleeEnemy.attackLeftRect.left = 0;
         meleeEnemy.attackRightRect.left = 0;
 
-        if (meleeEnemy.posRelative == lineOfSight::right)
+        if (meleeEnemy.posRelative == LineOfSight::right)
         {
             meleeEnemy.speedX = 0.1;
-            meleeEnemy.sight = lineOfSight::right;
+            meleeEnemy.sight = LineOfSight::right;
         }
         else
         {
             meleeEnemy.speedX = -0.1;
-            meleeEnemy.sight = lineOfSight::left;
+            meleeEnemy.sight = LineOfSight::left;
         }
     }
 
@@ -407,12 +407,12 @@ void combatStayMode(Player edward, float deltaTime, MeleeEnemy &meleeEnemy)
 {
     if (!isPlayerNear(edward, meleeEnemy))
     {
-        meleeEnemy.state = enemyState::patrol;
+        meleeEnemy.state = EnemyState::patrol;
     }
 
     if (isPlayerInAttackZone(edward, meleeEnemy))
     {
-        meleeEnemy.state = enemyState::combat;
+        meleeEnemy.state = EnemyState::combat;
         meleeEnemy.speedX = 0;
         meleeEnemy.attackZone = true;
     }
@@ -441,14 +441,14 @@ void collisionEnemy(MeleeEnemy &meleeEnemy, Player edward, String *solidPtr, flo
                     meleeEnemy.pos.x = j * blockSize - meleeEnemy.standRightRect.width;
                 if ((meleeEnemy.speedX < 0))
                     meleeEnemy.pos.x = j * blockSize + blockSize;
-                if (meleeEnemy.state == enemyState::patrol)
+                if (meleeEnemy.state == EnemyState::patrol)
                 {
                     meleeEnemy.speedX *= -1;
                 }
                 else
                 {
                     meleeEnemy.speedX = 0;
-                    meleeEnemy.state = enemyState::combatStay;
+                    meleeEnemy.state = EnemyState::combatStay;
                 }
             }
         }

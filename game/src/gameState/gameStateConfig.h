@@ -1,0 +1,3 @@
+const int TITRES_INITIAL_POS_X = 800;
+const int TITRES_INITIAL_POS_Y = 900;
+const int TITRES_SPEED = 80;
